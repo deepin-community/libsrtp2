@@ -1,60 +1,67 @@
 #!/usr/bin/make -f
 
-stem = $(DEB_SOURCE_PACKAGE)
-major := $(shell grep ^SHAREDLIBVERSION Makefile.in | grep -o '[[:digit:]]*' | head -n 1)
-pkg-lib = $(stem)-$(major)
-pkg-dev = $(stem)-dev
-pkg-doc = $(stem)-docs
-
-include /usr/share/cdbs/1/class/autotools.mk
-include /usr/share/cdbs/1/rules/debhelper.mk
-include /usr/share/cdbs/1/rules/upstream-tarball.mk
-
-include /usr/share/pkg-kde-tools/makefiles/1/cdbs/symbolshelper.mk
-
-libname = $(stem)
-
-DEB_CONFIGURE_EXTRA_FLAGS = --disable-stdout --enable-syslog
+CONFIGURE_OPTS = --disable-stdout --enable-syslog
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-DEB_CONFIGURE_EXTRA_FLAGS += --enable-debug
+CONFIGURE_OPTS += --enable-debug
 else
-DEB_CONFIGURE_EXTRA_FLAGS += --disable-debug
+CONFIGURE_OPTS += --disable-debug
 endif
-DEB_CONFIGURE_EXTRA_FLAGS += --libdir=\$${prefix}/lib/$(DEB_HOST_MULTIARCH)
 
-DEB_CONFIGURE_EXTRA_FLAGS += --enable-nss
+CONFIGURE_OPTS += --enable-nss
+
+DEB_CFLAGS_MAINT_APPEND = -D_REENTRANT
 
 ifeq ($(DEB_HOST_ARCH_CPU),sparc)
-CFLAGS += -DFORCE_64BIT_ALIGN
+DEB_CFLAGS_MAINT_APPEND += -DFORCE_64BIT_ALIGN
 endif
 
-CFLAGS += -D_REENTRANT
-
 # Reapply default strong optimizations unless noopt in DEB_BUILD_OPTIONS
-CFLAGS += $(if $(filter noopt,$(DEB_BUILD_OPTIONS))-O0,-O4 -fexpensive-optimizations -funroll-loops)
+ifeq (,$(filter noopt,$(DEB_BUILD_OPTIONS)))
+DEB_CFLAGS_MAINT_STRIP = -O2
+DEB_CFLAGS_MAINT_APPEND += -O4 -fexpensive-optimizations -funroll-loops
+endif
 
-DEB_MAKE_BUILD_TARGET = shared_library test
-DEB_MAKE_CLEAN_TARGET = superclean
-DEB_MAKE_CHECK_TARGET = runtest \
- LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(realpath $(DEB_SRCDIR))"
+export DEB_CFLAGS_MAINT_APPEND
 
-# generate (and cleanup) documentation
-build/$(pkg-doc):: debian/stamp-make-docs
-debian/stamp-make-docs:
-	$(DEB_MAKE_INVOKE) $(libname)doc
-	touch $@
+%:
+	dh $@
+
+# TODO: stop suppress when understood how to tame dh_autoreconf
+override_dh_autoreconf:
+
+override_dh_auto_configure:
+	dh_auto_configure -- $(CONFIGURE_OPTS)
+
+override_dh_auto_build-arch:
+	dh_auto_build -- shared_library test
+
+override_dh_auto_build-indep:
+	dh_auto_build -- libsrtp2doc
 
 # Ensure test script is executable
-post-patches::
+execute_before_dh_auto_test:
 	chmod +x test/rtpw_test.sh
+
+override_dh_auto_test-arch:
+	LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(realpath .)" dh_auto_test -- runtest
+
+override_dh_auto_test-indep:
+
+override_dh_auto_install-indep:
 
 # Let d-shlibs calculate development package dependencies
 #  and handle shared library install
-binary-post-install/$(pkg-lib)::
+execute_after_dh_install-arch:
 	d-shlibmove --commit \
 		--devunversioned \
 		--multiarch \
 		--movedev "debian/tmp/usr/include/*" usr/include/ \
 		--movedev "debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig/*" \
 			usr/lib/$(DEB_HOST_MULTIARCH)/pkgconfig \
-		debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/$(libname).so
+		debian/tmp/usr/lib/$(DEB_HOST_MULTIARCH)/*.so
+
+override_dh_strip:
+	dh_strip --dbgsym-migration='libsrtp2-1-dbg (<< 2.5.0-1~)'
+
+override_dh_auto_clean:
+	dh_auto_clean -- superclean

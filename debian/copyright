@@ -2,20 +2,22 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: libSRTP
 Upstream-Contact: https://github.com/cisco/libsrtp/issues
 Source: https://github.com/cisco/libsrtp
- git://github.com/cisco/libsrtp
 
 Files: *
 Copyright:
   2001-2017  Cisco Systems, Inc.
+  2022       Dolby Laboratories, Inc.
 License: BSD-3-clause~Cisco
 
-Files: crypto/include/kernel_compat.h
+Files:
+ crypto/include/kernel_compat.h
  crypto/rng/rand_linux_kernel.c
 Copyright:
   2005  Ingate Systems AB
 License: BSD-3-clause~Ingate
 
-Files: config.guess
+Files:
+ config.guess
  config.sub
 Copyright:
   1992-2016  Free Software Foundation, Inc.
@@ -32,23 +34,28 @@ License: GPL-2+ with Autoconf exception
  you may include it under the same distribution terms
  that you use for the rest of that program.
 
-Files: configure
+Files:
+ configure
 Copyright:
   2003  Free Software Foundation, Inc
 License: FSFUL
 
-Files: install-sh
+Files:
+ install-sh
 Copyright:
   1994  X Consortium
 License: X11
 
-Files: test/cutest.h
-Copyright: 2013-2017, Martin Mitas
+Files:
+ test/cutest.h
+Copyright:
+  2013-2017  Martin Mitas
 License: Expat
 
-Files: debian/*
+Files:
+ debian/*
 Copyright:
-  2007-2021  Jonas Smedegaard <dr@jones.dk>
+  2007-2023  Jonas Smedegaard <dr@jones.dk>
 License-Grant:
  This packaging is free software;
  you can redistribute it and/or modify it
@@ -124,16 +131,16 @@ License: Expat
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
  OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+License: FSFUL
+ This configure script is free software;
+ the Free Software Foundation gives unlimited permission
+ to copy, distribute and modify it.
+
 License: GPL-2+
 Reference: /usr/share/common-licenses/GPL-2
 
 License: GPL-3+
 Reference: /usr/share/common-licenses/GPL-3
-
-License: FSFUL
- This configure script is free software;
- the Free Software Foundation gives unlimited permission
- to copy, distribute and modify it.
 
 License: X11
  Permission is hereby granted, free of charge,
