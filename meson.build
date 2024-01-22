@@ -1,4 +1,4 @@
-project('libsrtp2', 'c', version: '2.4.2',
+project('libsrtp2', 'c', version: '2.5.0',
   meson_version: '>= 0.52.0',
   default_options: ['buildtype=debugoptimized'])
 
@@ -46,6 +46,7 @@ endforeach
 check_functions = [
   'sigaction',
   'inet_aton',
+  'inet_pton',
   'usleep',
   'socket',
 ]
@@ -123,7 +124,7 @@ use_nss = false
 
 crypto_library = get_option('crypto-library')
 if crypto_library == 'openssl'
-  openssl_dep = dependency('openssl', version: '>= 1.0.1', required: true)
+  openssl_dep = dependency('openssl', version: '>= 1.1.0', required: true)
   srtp2_deps += [openssl_dep]
   cdata.set('GCM', true)
   cdata.set('OPENSSL', true)
@@ -264,7 +265,8 @@ else
   libsrtp2 = libsrtp2_static
 endif
 
-subdir('include/srtp2') # copies public_headers into the builddir and sets public_incs
+subdir('include/srtp2') # copies public_headers into the builddir
+public_incs = include_directories('include') # sets public_incs
 
 libsrtp2_dep = declare_dependency(link_with: libsrtp2,
   include_directories: public_incs)

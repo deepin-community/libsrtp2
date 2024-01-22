@@ -92,9 +92,11 @@ License: BSD-3-clause
 Files: CHANGES
  CMakeLists.txt
  CODEOWNERS
+ Config.cmake.in
  Makefile.in
  cmake/FindMbedTLS.cmake
  cmake/FindNSS.cmake
+ cmake/FindPCAP.cmake
  config_in.h
  config_in_cmake.h
  configure.ac
@@ -117,6 +119,7 @@ Files: CHANGES
  debian/patches/series
  debian/rules
  debian/source/format
+ debian/source/lintian-overrides
  debian/watch
  doc/Doxyfile.in
  doc/Makefile.in
@@ -158,6 +161,12 @@ Copyright: 2001-2005, David A. McGrew, Cisco Systems, Inc.
 License: BSD-3-clause
  FIXME
 
+Files: include/stream_list_priv.h
+Copyright: 2001-2017, Cisco Systems, Inc.
+  2022, Dolby Laboratories, Inc.
+License: BSD-3-clause
+ FIXME
+
 Files: test/cutest.h
 Copyright: 2013-2017, Martin Mitas
 License: Expat
@@ -167,14 +176,6 @@ Files: configure
 Copyright: 1992-1996, 1998-2012, Free Software Foundation, Inc.
   2012, Free Software Foundation, Inc.
 License: FSFUL
- FIXME
-
-Files: debian/source/lintian-overrides
-Copyright: debian/copyright GPL-2+
-  debian/copyright GPL-3+
-  debian/copyright gpl-2+
-  debian/copyright gpl-3+
-License: UNKNOWN
  FIXME
 
 Files: install-sh

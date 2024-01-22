@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-project(libsrtp2 VERSION 2.4.2 LANGUAGES C)
+project(libsrtp2 VERSION 2.5.0 LANGUAGES C)
 
 set(PACKAGE_VERSION ${CMAKE_PROJECT_VERSION})
 set(PACKAGE_STRING "${CMAKE_PROJECT_NAME} ${CMAKE_PROJECT_VERSION}")
@@ -37,6 +37,7 @@ check_include_file(winsock2.h HAVE_WINSOCK2_H)
 
 check_function_exists(sigaction HAVE_SIGACTION)
 check_function_exists(inet_aton HAVE_INET_ATON)
+check_function_exists(inet_pton HAVE_INET_PTON)
 check_function_exists(usleep HAVE_USLEEP)
 
 check_type_size(uint8_t UINT8_T)
@@ -60,6 +61,7 @@ set(ENABLE_MBEDTLS OFF CACHE BOOL "Enable MbedTLS crypto engine")
 set(ENABLE_NSS OFF CACHE BOOL "Enable NSS crypto engine")
 set(TEST_APPS ON CACHE BOOL "Build test applications")
 set(BUILD_WITH_SANITIZERS OFF CACHE BOOL "Adds sanitizer flags to compiler")
+set(BUILD_WITH_WARNINGS ON CACHE BOOL "Adds warnings and warning as error flags to compiler")
 option(BUILD_SHARED_LIBS "Build shared library" OFF)
 
 if(ENABLE_OPENSSL OR ENABLE_MBEDTLS OR ENABLE_NSS)
@@ -72,7 +74,7 @@ if(ENABLE_OPENSSL)
   if(ENABLE_NSS OR ENABLE_MBEDTLS)
     message(FATAL_ERROR "ssl conflict. can not enable openssl and mbedtls or nss simultaneously.")
   endif()
-  find_package(OpenSSL REQUIRED)
+  find_package(OpenSSL 1.1.0 REQUIRED)
   set(OPENSSL ${ENABLE_OPENSSL} CACHE BOOL INTERNAL)
   set(GCM ${ENABLE_OPENSSL} CACHE BOOL INTERNAL)
 endif()
@@ -113,6 +115,17 @@ if(BUILD_WITH_SANITIZERS AND NOT WIN32)
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=${SANITIZERS}")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=${SANITIZERS}")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -fno-omit-frame-pointer -fsanitize=${SANITIZERS}")
+endif()
+
+
+if(BUILD_WITH_WARNINGS)
+  if(CMAKE_C_COMPILER_ID MATCHES "Clang" OR CMAKE_C_COMPILER_ID MATCHES "GNU")
+    set(WARNINGS -Wall -pedantic -Wextra -Werror)
+  elseif(MSVC)
+    set(WARNINGS /W4 /WX)
+  endif()
+  message(STATUS "Using warnings: ${WARNINGS}")
+  add_compile_options(${WARNINGS})
 endif()
 
 set(SOURCES_C
@@ -237,10 +250,15 @@ add_library(srtp2
   ${REPLAY_SOURCES_C}
   ${SOURCES_H}
 )
+add_library(libSRTP::srtp2 ALIAS srtp2)
 
 set_target_properties(srtp2 PROPERTIES VERSION ${CMAKE_PROJECT_VERSION})
 
-target_include_directories(srtp2 PUBLIC crypto/include include)
+target_include_directories(srtp2 PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/crypto/include>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
 if(ENABLE_OPENSSL)
   target_include_directories(srtp2 PRIVATE ${OPENSSL_INCLUDE_DIR})
   target_link_libraries(srtp2 OpenSSL::Crypto)
@@ -256,7 +274,10 @@ if(WIN32)
   target_compile_definitions(srtp2 PUBLIC _CRT_SECURE_NO_WARNINGS)
 endif()
 
-install(TARGETS srtp2 DESTINATION lib)
+install(TARGETS srtp2 DESTINATION lib
+  EXPORT libSRTPTargets
+)
+
 install(FILES include/srtp.h crypto/include/auth.h
   crypto/include/cipher.h
   crypto/include/crypto_types.h
@@ -264,6 +285,12 @@ install(FILES include/srtp.h crypto/include/auth.h
 
 if(TEST_APPS)
   enable_testing()
+
+  find_package(PCAP)
+  if (PCAP_FOUND)
+    add_executable(rtp_decoder test/rtp_decoder.c test/getopt_s.c test/util.c)
+    target_link_libraries(rtp_decoder srtp2 ${PCAP_LIBRARY})
+  endif()
 
   if(NOT (BUILD_SHARED_LIBS AND WIN32))
     if(NOT USE_EXTERNAL_CRYPTO)
@@ -346,3 +373,40 @@ if(TEST_APPS)
     endif()
   endif()
 endif()
+
+# Export targets
+install(
+  EXPORT libSRTPTargets
+  FILE libSRTPTargets.cmake
+	NAMESPACE libSRTP::
+	DESTINATION lib/cmake/libSRTP
+)
+
+#--------------------------------------------------------------------
+# Create generated files
+#--------------------------------------------------------------------
+include(CMakePackageConfigHelpers)
+
+# Generate the config file that is includes the exports
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.cmake.in
+  "${CMAKE_CURRENT_BINARY_DIR}/libSRTPConfig.cmake"
+  INSTALL_DESTINATION "${CONFIG_FILE_DIR}"
+  NO_SET_AND_CHECK_MACRO
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO
+)
+
+# Generate the version file for the config file
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/libSRTPConfigVersion.cmake"
+  VERSION "${CMAKE_PROJECT_VERSION}"
+  COMPATIBILITY AnyNewerVersion
+)
+
+#--------------------------------------------------------------------
+# Install CMake config files
+#--------------------------------------------------------------------
+install(FILES
+  ${CMAKE_CURRENT_BINARY_DIR}/libSRTPConfig.cmake
+  ${CMAKE_CURRENT_BINARY_DIR}/libSRTPConfigVersion.cmake
+  DESTINATION lib/cmake/libSRTP
+)

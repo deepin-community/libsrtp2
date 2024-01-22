@@ -1,3 +1,55 @@
+libsrtp2 (2.5.0-3) unstable; urgency=medium
+
+  * update symbols:
+    + 8 optional symbols dropped
+    + 7 optional symbols added
+
+ -- Jonas Smedegaard <dr@jones.dk>  Sun, 05 Feb 2023 12:06:39 +0100
+
+libsrtp2 (2.5.0-2) experimental; urgency=medium
+
+  * fix separate arch and indep build routines
+
+ -- Jonas Smedegaard <dr@jones.dk>  Sat, 04 Feb 2023 18:05:40 +0100
+
+libsrtp2 (2.5.0-1) experimental; urgency=medium
+
+  [ upstream ]
+  * new release
+
+  [ Jonas Smedegaard ]
+  * drop patches cherry-picked upstream now applied
+  * update and unfuzz patches
+  * declare compliance with Debian Policy 4.6.2
+  * update copyright info: update coverage
+  * update git-buildpackage config:
+    + use DEP-14 git branches
+    + enable automatic DEP-14 branch name handling
+    + add usage config
+  * simplify build;
+    build-depend dh-sequence-pkgkde-symbolshelper;
+    stop build-depend on cdbs
+  * use debhelper compatibility level 13 (not 10);
+    build-depend on debhelper-compat (not debhelper)
+  * stop provide binary package libsrtp2-1-dbg
+
+ -- Jonas Smedegaard <dr@jones.dk>  Sat, 04 Feb 2023 16:40:43 +0100
+
+libsrtp2 (2.4.2-3) unstable; urgency=medium
+
+  * add patches cherry-picked upstream:
+    + count blocks instead of bytes in AES-ICM limit computation
+    + cast time_t values to known types for formatting in fprintf;
+      closes: bug#958427, thanks to Laurent Bigonville
+    + avoid deprecated OpenSSL dunction EVP_CIPHER_CTX_cleanup()
+  * update copyright info:
+    + sort License sections alphabetically
+    + drop superfluous secondary source URI
+    + update coverage
+  * tighten lintian overrides
+
+ -- Jonas Smedegaard <dr@jones.dk>  Mon, 07 Mar 2022 15:22:16 +0100
+
 libsrtp2 (2.4.2-2) unstable; urgency=medium
 
   * fix stop depend (only build-depend) on libpcap0.8-dev

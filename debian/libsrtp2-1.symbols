@@ -1,10 +1,9 @@
-# SymbolsHelper-Confirmed: 2.4.0 amd64 arm64 armel armhf hurd-i386 i386 ia64 powerpc ppc64 ppc64el riscv64 s390x
+# SymbolsHelper-Confirmed: 2.5.0 amd64 arm64 armel armhf hppa i386 ia64 powerpc ppc64 ppc64el riscv64 s390x sparc64
 libsrtp2.so.1 libsrtp2-1 #MINVER#
  (optional=privatelib)bitvector_alloc@Base 2.0.0
  (optional=privatelib)bitvector_dealloc@Base 2.0.0
  (optional=privatelib)bitvector_left_shift@Base 2.0.0
  (optional=privatelib)bitvector_set_to_zero@Base 2.0.0
- (optional=privatelib)crypto_kernel@Base 2.0.0
  (optional=privatelib)get_protect_trailer_length@Base 2.2.0
  (optional=privatelib)mod_srtp@Base 2.0.0
  (optional=privatelib)octet_string_set_to_zero@Base 2.0.0
@@ -78,7 +77,6 @@ libsrtp2.so.1 libsrtp2-1 #MINVER#
  srtp_crypto_policy_set_rtcp_default@Base 2.0.0
  srtp_crypto_policy_set_rtp_default@Base 2.0.0
  srtp_dealloc@Base 2.0.0
- (optional=privatelib)srtp_err_handler@Base 2.0.0+20170516
  (optional=privatelib)srtp_err_report@Base 2.0.0
  (optional=privatelib)srtp_err_reporting_init@Base 2.0.0
  (optional=privatelib)srtp_event_reporter@Base 2.0.0
@@ -112,7 +110,6 @@ libsrtp2.so.1 libsrtp2-1 #MINVER#
  (optional=privatelib)srtp_mod_cipher@Base 2.0.0
  (optional=privatelib)srtp_mod_crypto_kernel@Base 2.0.0
  (optional=privatelib)srtp_mod_hmac@Base 2.0.0
- (optional=privatelib)srtp_nibble_to_hex_char@Base 2.0.0
  (optional=privatelib)srtp_null_auth@Base 2.0.0
  (optional=privatelib)srtp_null_cipher@Base 2.0.0
  (optional=privatelib)srtp_octet_string_hex_string@Base 2.0.0
@@ -145,19 +142,21 @@ libsrtp2.so.1 libsrtp2-1 #MINVER#
  srtp_set_stream_roc@Base 2.0.0+20170516
  srtp_set_user_data@Base 2.0.0
  srtp_shutdown@Base 2.0.0
- (optional=privatelib)srtp_stream_alloc@Base 2.0.0
- (optional=privatelib)srtp_stream_clone@Base 2.0.0
- (optional=privatelib)srtp_stream_dealloc@Base 2.0.0
- (optional=privatelib)srtp_stream_init@Base 2.0.0
  (optional=privatelib)srtp_stream_init_all_master_keys@Base 2.0.0+20170516
  (optional=privatelib)srtp_stream_init_keys@Base 2.0.0
+ srtp_stream_list_alloc@Base 2.5.0
+ srtp_stream_list_ctx_t_@Base 2.5.0
+ srtp_stream_list_dealloc@Base 2.5.0
+ srtp_stream_list_for_each@Base 2.5.0
+ srtp_stream_list_get@Base 2.5.0
+ srtp_stream_list_insert@Base 2.5.0
+ srtp_stream_list_remove@Base 2.5.0
  srtp_unprotect@Base 2.0.0
  srtp_unprotect_mki@Base 2.0.0+20170516
  srtp_unprotect_rtcp@Base 2.0.0
  srtp_unprotect_rtcp_mki@Base 2.0.0+20170516
  srtp_update@Base 2.0.0
  srtp_update_stream@Base 2.0.0
- (optional=privatelib)srtp_validate_policy_master_keys@Base 2.0.0+20170516
  (optional=privatelib)stream_get_protect_trailer_length@Base 2.2.0
  (optional=privatelib)v128_bit_string@Base 2.0.0
  (optional=privatelib)v128_copy_octet_string@Base 2.0.0
